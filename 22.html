@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<script type="text/javascript">
+var canvas, ctx
+list = [];
+prevX = 0,
+currX = 0,
+prevY = 0,
+currY = 0;
+var x = "blue",
+y = 2,
+dr = "line";
+function init() {
+	canvas = document.getElementById('can');
+	ctx = canvas.getContext("2d");
+	w = canvas.width;
+	h = canvas.height;
+	canvas.addEventListener("mousedown", function (e) {
+	findxy('down', e)}, false);
+	canvas.addEventListener("mouseup", function (e) {
+	findxy('up', e)}, false);
+}
+function color(obj) {
+	y=2;
+	if(obj.id == "red"){
+		x = "red";
+	}
+	else if(obj.id == "blue"){
+		x = "blue";
+	}
+	else if(obj.id == "green"){
+		x = "green";
+	}
+	else if(obj.id == "yellow"){
+		x = "yellow";
+	}
+	else if(obj.id == "white"){
+		x = "white";
+		y=16	
+	}
+	else if(obj.id == "orange"){
+		x = "orange";
+	}
+	else{
+		x = "black";
+	}
+}
+function draw(obj) {
+	ctx.beginPath();
+	if (obj.id == "line"){
+		dr="line";
+	}
+	else if (obj.id == "rect"){
+		dr="rect";
+	}
+	else if (obj.id == "circle"){
+		dr="circle";
+	}
+	else if(obj.id == "clear"){
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		list = [];
+	}
+}
+function findxy(res,e) {
+	if (res == 'down') {
+		prevX = e.clientX - canvas.offsetLeft;
+		prevY = e.clientY - canvas.offsetTop;
+		ctx.beginPath();
+		ctx.moveTo(prevX, prevY);
+		ctx.lineTo(prevX+1, prevY+1);
+		ctx.strokeStyle = x;
+		ctx.lineWidth = y;
+		ctx.stroke();
+		ctx.closePath();
+	}
+	if (res == 'up') {
+		currX = e.clientX - canvas.offsetLeft;
+		currY = e.clientY - canvas.offsetTop;
+		selectone();
+	}
+}
+function selectone(){
+	ctx.beginPath();
+	if(dr == "line"){
+		ctx.moveTo(prevX, prevY);
+		ctx.lineTo(currX, currY);
+		list.push(JSON.stringify({"name":"line","start_x":+prevX,"start_y":+prevY,"end_x":+currX,"end_y":currY}))
+	}
+	else if(dr == "rect"){
+		ctx.rect(prevX,prevY,currX-prevX,currY-prevY);
+		var e=currX-prevX;
+		var w=currY-currX;
+		var b={"name":"rectangle","start_x":+prevX,"start_y":+prevY,"x_defference(end-strt)":+e,"y_difference(end-strt)":+w};
+		list.push(JSON.stringify(b))
+	}
+	else if(dr == "circle"){
+		radius=(prevX-currX)^2+(prevY-currY)^2;
+		ctx.arc(prevX, prevY, radius, 0, 2 * Math.PI, false);
+		list.push(JSON.stringify({"name":"circle","radius":+radius,"start_x":+prevX,"start_y":+prevY}))
+	}
+	ctx.strokeStyle = x;
+	ctx.lineWidth = y;
+	ctx.stroke();
+	ctx.closePath();
+}
+function myFunction(){
+	if (dr == "circle"){ 
+		alert(list);
+	}
+	else if (dr == "line"){
+		alert(list);
+	}
+	else if (dr == "rect"){
+		alert(list);
+	}
+	list = [];
+}
+</script>
+<body onload="init()">
+<div style="position:absolute;top:5%;left:18%;text-decoration: underline;"><strong>DRAWING TOOLS</strong></div>
+<div style="position:absolute;top:25%;left:58%;text-decoration: underline;"><strong>SELECT COLOUR</strong></div>
+<div style="position:absolute;top:33%;left:61%;">green</div>
+<div style="position:absolute;top:36%;left:61%;width:16px;height:16px;background:green;" id="green" onclick="color(this)"></div>
+<div style="position:absolute;top:41%;left:61%;">blue</div>
+<div style="position:absolute;top:44%;left:61%;width:16px;height:16px;background:blue;" id="blue" onclick="color(this)"></div>
+<div style="position:absolute;top:50%;left:61%;">red</div>
+<div style="position:absolute;top:53%;left:61%;width:16px;height:16px;background:red;" id="red" onclick="color(this)"></div>
+<div style="position:absolute;top:58%;left:61%;">yellow</div>
+<div style="position:absolute;top:61%;left:61%;width:16px;height:16px;background:yellow;" id="yellow" onclick="color(this)"></div>
+<div style="position:absolute;top:66%;left:61%;">orange</div>
+<div style="position:absolute;top:69%;left:61%;width:16px;height:16px;background:orange;" id="orange" onclick="color(this)"></div>
+<div style="position:absolute;top:74%;left:61%;">black</div>
+<div style="position:absolute;top:77%;left:61%;width:16px;height:16px;background:black;" id="black" onclick="color(this)"></div>
+<div style="position:absolute;top:12%;left:8%;">Eraser</div>
+<div style="position:absolute;top:15%;left:8%;width:16px;height:16px;background:white;border:1px solid;" id="white" onclick="color(this)" value="e" color="black"></div>
+<div style="position:absolute;top:12%;left:14%;">Rect</div>
+<div style="position:absolute;top:15%;left:14%;width:16px;height:16px;background:gray;border:1px solid;" id="rect" onclick="draw(this)">
+</div>
+<div style="position:absolute;top:12%;left:20%;">Line</div>
+<div style="position:absolute;top:15%;left:20%;width:16px;height:16px;background:gray;border:1px solid;" id="line" onclick="draw(this)">
+</div>
+<div style="position:absolute;top:12%;left:26%;">Circle</div>
+<div style="position:absolute;top:15%;left:26%;width:16px;height:16px;background:gray;border:1px solid;" id="circle" onclick="draw(this)">
+</div>
+<div style="position:absolute;top:12%;left:32%;">Clear</div>
+<div style="position:absolute;top:15%;left:32%;width:16px;height:16px;background:gray;border:1px solid;" id="clear" onclick="draw(this)">
+<br>
+<br>
+<div style="position:absolute; left: 220px; top: -20px;">
+<button onclick="myFunction()";>JSON <br> representation</button>
+</div>
+</div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<canvas id="can" width="700" height="460" style="border:2px solid;"></canvas>
+</body>
+</html>
+
+    
+
+
+
